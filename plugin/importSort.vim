@@ -23,15 +23,15 @@ def importSort(x, y):
 
     Xwords = x.split()
     Ywords = y.split()
-    
+
     # Handle imports and static first
     if len(Xwords) > 1:
         # TODO make import modular
         assert( ( Xwords[0] == "import" ) and ( Ywords[0] == "import") )
-        for extra in extras: 
+        for extra in extras:
             if ( Xwords[1] == extra )  == ( Ywords[1] == extra ):
                 if Xwords[1] == extra:
-                   break 
+                   break
                 else:
                     continue
             return lessThan if Xwords[1] == extra else greaterThan
@@ -53,7 +53,7 @@ def importSort(x, y):
 
 def sanitize( lines ):
     # remove duplicates
-    lines = list(set(lines))    
+    lines = list(set(lines))
     # remove strings that are just spaces or empty
     lines = [ x for x in lines if ( x or not x.isspace ) ]
     return lines
@@ -76,18 +76,18 @@ class importCompare:
 
 def parseTemplates():
     pass
-    # TODO set up templates 
+    # TODO set up templates
 
 
 def collectImports( lines ):
     parseTemplates()
-    lines = sanitize( lines ) 
+    lines = sanitize( lines )
     sortedLines = sorted(lines, key=importCompare)
     groupByObject = groupby(sortedLines, importCompare)
     groupedSortedLines  = []
     for _, group in groupByObject:
         groupedSortedLines +=  (list(group))
-        groupedSortedLines += [""] 
+        groupedSortedLines += [""]
 
     return groupedSortedLines
 
