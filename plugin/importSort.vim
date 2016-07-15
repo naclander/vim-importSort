@@ -10,10 +10,12 @@ import static test.static.test
 
 python << endpython
 import vim
+import json
 from itertools import groupby
 
 # This is the also the order (top to bottom) at which the imports must appear
 keyword  = "import"
+split    = "."
 extras   = ['static']
 prefixes = ['java', 'javax', 'org', 'com']
 
@@ -39,8 +41,8 @@ def importSort(x, y):
 
         return importSort(Xwords[-1], Ywords[-1] )
 
-    Xwords = x.split('.')
-    Ywords = y.split('.')
+    Xwords = x.split( split )
+    Ywords = y.split( split )
 
     for prefix in prefixes:
         if ( Xwords[0] == prefix)  == ( Ywords[0] == prefix ):
@@ -81,7 +83,22 @@ class importCompare:
 
 def parseTemplates():
     pass
-    # TODO set up templates
+    """
+    with open(???) as template:
+        data = json.load(template)
+
+        keyword = data["import"]
+        assert(keyword != None)
+
+        split = data["split"]
+        assert( split )
+
+        extras = data["static"]
+        assert( extras )
+
+        prefixes = data["prefixes"]
+        assert( prefixes )
+        """
 
 
 def collectImports( lines ):
@@ -108,8 +125,15 @@ function! s:start()
     let lines = getline(lnum1, lnum2)
     let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
     let lines[0] = lines[0][col1 - 1:]
+ 
+    let path = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
+    let filetype = &filetype
 
 python << endpython
+
+pluginPath = vim.eval("path")
+filetype = vim.eval("filetype")
 
 lines = collectImports(vim.eval( "lines" ) )
 vim.command("'<,'> d")

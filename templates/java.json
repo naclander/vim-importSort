@@ -1,0 +1,7 @@
+{
+    "language" : "java",
+    "keyword"  : "import",
+    "split"    : ".",
+    "extras"   :  ["static"],
+    "prefixes" : ["java", "javax", "org", "com" ]
+}
