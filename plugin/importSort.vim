@@ -13,10 +13,12 @@ import vim
 from itertools import groupby
 
 # This is the also the order (top to bottom) at which the imports must appear
+keyword  = "import"
 extras   = ['static']
 prefixes = ['java', 'javax', 'org', 'com']
 
 
+# A comparator function that determines ordering by a predefined set of prefixes.
 def importSort(x, y):
     lessThan = -1
     greaterThan = 1
@@ -26,8 +28,7 @@ def importSort(x, y):
 
     # Handle imports and static first
     if len(Xwords) > 1:
-        # TODO make import modular
-        assert( ( Xwords[0] == "import" ) and ( Ywords[0] == "import") )
+        assert( ( Xwords[0] == keyword ) and ( Ywords[0] == keyword) )
         for extra in extras:
             if ( Xwords[1] == extra )  == ( Ywords[1] == extra ):
                 if Xwords[1] == extra:
@@ -52,12 +53,16 @@ def importSort(x, y):
     return str.__eq__( x, y )
 
 def sanitize( lines ):
-    # remove duplicates
+    # Remove duplicates
     lines = list(set(lines))
-    # remove strings that are just spaces or empty
+
+    # Remove strings that are only spaces, or empty
     lines = [ x for x in lines if ( x or not x.isspace ) ]
+
     return lines
 
+# A class wrapper so that a custom comparator can be used as a key.
+# This is necessary because the python 3 sort function only accepts keys.
 class importCompare:
     def __init__(self, obj, *args):
         self.obj = obj
@@ -80,11 +85,14 @@ def parseTemplates():
 
 
 def collectImports( lines ):
+    groupedSortedLines  = []
+
     parseTemplates()
+
     lines = sanitize( lines )
     sortedLines = sorted(lines, key=importCompare)
     groupByObject = groupby(sortedLines, importCompare)
-    groupedSortedLines  = []
+
     for _, group in groupByObject:
         groupedSortedLines +=  (list(group))
         groupedSortedLines += [""]
@@ -105,19 +113,14 @@ python << endpython
 
 lines = collectImports(vim.eval( "lines" ) )
 vim.command("'<,'> d")
-#vim.command('execute "normal! <,\'> d"')
 
 for line in lines:
-    #vim.command("norm i" + line + "\n" )
     vim.command('execute "normal! i' + line + '\<cr>"')
 
-vim.command('execute "normal! dd"')
-vim.command('execute "normal! k"')
+vim.command('execute "normal! ddk"')
 
 endpython
-
-    return lines
 endfunction
 
 command ImportSort call <sid>start()
-xmap e :ImportSort
+xmap e :<c-u>ImportSort<cr>
