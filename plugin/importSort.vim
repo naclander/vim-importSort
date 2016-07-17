@@ -1,3 +1,6 @@
+command ImportSort call <sid>start()
+let s:pluginPath = expand('<sfile>:p:h:h')
+
 python << endpython
 import vim
 import json
@@ -73,7 +76,9 @@ class importCompare:
 
 # Determine import line format based on file type specific templates
 def parseTemplates( templatePath ):
-    assert( os.path.isfile(templatePath ) )
+    if not os.path.isfile(templatePath):
+       print( "No template file found for filetype")
+       raise IOError
 
     global keyword
     global split
@@ -130,8 +135,6 @@ vim.command("'<,'> d")
 for line in lines:
     vim.command('execute "normal! i' + line + '\<cr>"')
 vim.command('execute "normal! ddk"')
+
 endpython
 endfunction
-
-command ImportSort call <sid>start()
-let s:pluginPath = expand('<sfile>:p:h:h')
