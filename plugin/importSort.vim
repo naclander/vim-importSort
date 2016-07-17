@@ -11,13 +11,14 @@ import static test.static.test
 python << endpython
 import vim
 import json
+import os
 from itertools import groupby
 
 # This is the also the order (top to bottom) at which the imports must appear
-keyword  = "import"
-split    = "."
-extras   = ['static']
-prefixes = ['java', 'javax', 'org', 'com']
+keyword  = ""
+split    = ""
+extras   = []
+prefixes = []
 
 
 # A comparator function that determines ordering by a predefined set of prefixes.
@@ -81,30 +82,24 @@ class importCompare:
     def __ne__(self, other):
         return importSort(self.obj, other.obj) != 0
 
-def parseTemplates():
-    pass
-    """
-    with open(???) as template:
+def parseTemplates( templatePath ):
+    assert( os.path.isfile(templatePath ) )
+
+    global keyword
+    global split
+    global extras
+    global prefixes
+
+    with open(templatePath) as template:
         data = json.load(template)
-
-        keyword = data["import"]
-        assert(keyword != None)
-
+        keyword = data["keyword"]
         split = data["split"]
-        assert( split )
-
-        extras = data["static"]
-        assert( extras )
-
+        extras = data["extras"]
         prefixes = data["prefixes"]
-        assert( prefixes )
-        """
 
 
 def collectImports( lines ):
     groupedSortedLines  = []
-
-    parseTemplates()
 
     lines = sanitize( lines )
     sortedLines = sorted(lines, key=importCompare)
@@ -116,6 +111,10 @@ def collectImports( lines ):
 
     return groupedSortedLines
 
+def getTemplatePath( pluginPath, filetype ):
+    templatesDir = os.path.join(pluginPath, "templates")
+    return os.path.join(templatesDir, filetype + ".json")
+
 endpython
 
 function! s:start()
@@ -125,19 +124,17 @@ function! s:start()
     let lines = getline(lnum1, lnum2)
     let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
     let lines[0] = lines[0][col1 - 1:]
- 
-    let path = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
+    let pluginPath = fnamemodify(resolve(expand('<sfile>:p')), ':h')
     let filetype = &filetype
 
 python << endpython
 
-pluginPath = vim.eval("path")
-filetype = vim.eval("filetype")
+parseTemplates( getTemplatePath( vim.eval("pluginPath"), vim.eval("filetype") ) )
 
+# Sort import lines and write them to file
 lines = collectImports(vim.eval( "lines" ) )
 vim.command("'<,'> d")
-
 for line in lines:
     vim.command('execute "normal! i' + line + '\<cr>"')
 
