@@ -1,20 +1,9 @@
-import com.test.test
-import java.test.test
-import java.test.test2
-import com.google.test1
-import com.test.test
-import javax.test.test
-import custom.test.test
-
-import static test.static.test
-
 python << endpython
 import vim
 import json
 import os
 from itertools import groupby
 
-# This is the also the order (top to bottom) at which the imports must appear
 keyword  = ""
 split    = ""
 extras   = []
@@ -82,6 +71,7 @@ class importCompare:
     def __ne__(self, other):
         return importSort(self.obj, other.obj) != 0
 
+# Determine import line format based on file type specific templates
 def parseTemplates( templatePath ):
     assert( os.path.isfile(templatePath ) )
 
@@ -98,6 +88,7 @@ def parseTemplates( templatePath ):
         prefixes = data["prefixes"]
 
 
+# Returns a sorted list of import lines, grouped by prefixes
 def collectImports( lines ):
     groupedSortedLines  = []
 
@@ -112,6 +103,7 @@ def collectImports( lines ):
     return groupedSortedLines
 
 def getTemplatePath( pluginPath, filetype ):
+    print(pluginPath)
     templatesDir = os.path.join(pluginPath, "templates")
     return os.path.join(templatesDir, filetype + ".json")
 
@@ -125,23 +117,21 @@ function! s:start()
     let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
     let lines[0] = lines[0][col1 - 1:]
 
-    let pluginPath = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+    "let pluginPath = fnamemodify(resolve(expand('<sfile>:p')), ':h')
     let filetype = &filetype
 
 python << endpython
 
-parseTemplates( getTemplatePath( vim.eval("pluginPath"), vim.eval("filetype") ) )
+parseTemplates( getTemplatePath( vim.eval("s:pluginPath"), vim.eval("filetype") ) )
 
 # Sort import lines and write them to file
 lines = collectImports(vim.eval( "lines" ) )
 vim.command("'<,'> d")
 for line in lines:
     vim.command('execute "normal! i' + line + '\<cr>"')
-
 vim.command('execute "normal! ddk"')
-
 endpython
 endfunction
 
 command ImportSort call <sid>start()
-xmap e :<c-u>ImportSort<cr>
+let s:pluginPath = expand('<sfile>:p:h:h')
