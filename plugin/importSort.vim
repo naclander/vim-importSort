@@ -108,7 +108,6 @@ def collectImports( lines ):
     return groupedSortedLines
 
 def getTemplatePath( pluginPath, filetype ):
-    print(pluginPath)
     templatesDir = os.path.join(pluginPath, "templates")
     return os.path.join(templatesDir, filetype + ".json")
 
