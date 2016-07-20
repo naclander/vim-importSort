@@ -2,6 +2,8 @@
 
 A vim plugin to help keep your import/require/#include statements sorted.
 
+![alt tag](http://i.imgur.com/pnmKga0.gif)
+
 Currently there is support for Java. Support for other languages should be straightforward to add, by including a template file for that lanaguage (and fixing some bugs)
 
 ## Installation
