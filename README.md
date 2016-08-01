@@ -20,6 +20,6 @@ copy `importSort.vim` into your plugin directory.
 In visual mode, select the lines you wish to sort. Run `importSort` to sort the lines.
 Alternatively, you can add:
 ````vim
-xmap e :<c-u>ImportSort<cr> 
+xmap e :<c-u>ImportSort<cr>
 ````
 to you `vimrc` file.
